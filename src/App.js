@@ -1,58 +1,43 @@
-import React, { Component } from 'react';
+import React, { useState, useLayoutEffect, useCallback } from 'react';
 import Counter from './components/counter';
 import './App.css';
 
 const colors = [ 'white', 'red', 'green' ];
+const initialState = { count: 0, color: colors[0] };
 const updateInterval = 1000;
 
-class App extends Component {
-  state = { counter: 0, color: colors[0] };
+function App() {
+    const [ { count, color }, setCounter ] = useState(initialState);
+    const resetCounter = useCallback(() => {
+        setCounter(initialState);
+    }, []);
 
-  initialState = this.state;
-  interval = null;
+    useLayoutEffect(() => {
+        const interval = setInterval(() => {
+            const randomColor = colors[Math.floor((Math.random()*colors.length))];
 
-  componentWillMount() {
-      this.setInterval();
-  }
+            setCounter({
+                count: count + 1,
+                color: randomColor
+            });
+        }, updateInterval);
 
-  componentWillUnmount() {
-      this.clearInterval();
-  }
-
-  setInterval = () => {
-      this.interval = setInterval(() => {
-          this.setState((state) => {
-              return {
-                  counter: state.counter + 1,
-                  color: colors[Math.floor((Math.random()*colors.length))]
-              };
-          });
-      }, updateInterval);
-  };
-
-  clearInterval = () => {
-      clearInterval(this.interval);
-  };
-
-  resetCounter = () => {
-      this.setState(() => this.initialState);
-  };
-
-  render() {
-    const { counter, color } = this.state;
+        return () => {
+            clearInterval(interval);
+        }
+    }, [ count ]);
 
     return (
-      <div className="App">
-        <header className="App-header">
-            <Counter
-                count={counter}
-                color={color}
-                reset={this.resetCounter}
-            />
-        </header>
-      </div>
+        <div className="App">
+            <header className="App-header">
+                <Counter
+                    count={count}
+                    color={color}
+                    reset={resetCounter}
+                />
+            </header>
+        </div>
     );
-  }
 }
 
 export default App;
