@@ -1,5 +1,5 @@
 import React from 'react';
-import useReportPropChanges from '../hooks/reportPropChanges';
+import useReportPropChanges from '../hooks/useReportPropChanges';
 
 function Counter(props = {}) {
     const {
