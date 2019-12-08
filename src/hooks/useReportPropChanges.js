@@ -1,4 +1,21 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useReducer } from 'react';
+
+const ActionTypes = {
+    NEW_CHANGE: 'NEW_CHANGE'
+};
+
+const propChangesReducer = (state, action) => {
+    switch (action.type) {
+        case ActionTypes.NEW_CHANGE: {
+            return {
+                ...state,
+                lastChange: action.payload.newChange
+            };
+        }
+        default:
+            break;
+    }
+};
 
 function getUniqueChanges(previousProps, newProps) {
     const mergedProps = { ...previousProps, ...newProps };
@@ -19,6 +36,7 @@ function getUniqueChanges(previousProps, newProps) {
 }
 
 function useReportPropChanges(componentName, newProps) {
+    const [{ lastChange }, dispatch] = useReducer(propChangesReducer, { lastChange: {} });
     const previousProps = useRef(null);
     const { current: propsSnapshot } = previousProps;
 
@@ -27,12 +45,19 @@ function useReportPropChanges(componentName, newProps) {
             const uniqueChanges = getUniqueChanges(propsSnapshot, newProps);
 
             if (Object.keys(uniqueChanges).length > 0) {
-                console.log(`[${componentName}] Value of the following props changed:`, uniqueChanges);
+                dispatch({
+                    type: ActionTypes.NEW_CHANGE,
+                    payload: {
+                        newChange: uniqueChanges
+                    },
+                })
             }
         }
 
         previousProps.current = newProps;
     });
+
+    return [ lastChange ];
 }
 
 export default useReportPropChanges;

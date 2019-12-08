@@ -4,7 +4,7 @@ import './App.css';
 
 const colors = [ 'white', 'red', 'green' ];
 const initialState = { count: 0, color: colors[0] };
-const updateInterval = 1000;
+const updateInterval = 2500;
 
 function App() {
     const [ { count, color }, setCounter ] = useState(initialState);
